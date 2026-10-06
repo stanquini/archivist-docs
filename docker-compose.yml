@@ -6,9 +6,14 @@ services:
       POSTGRES_PASSWORD: archivist
       POSTGRES_DB: archivist
     ports:
-      - "5432:5432"
+      - "51214:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U archivist -d archivist"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
 
   api:
     build:
@@ -24,7 +29,8 @@ services:
     ports:
       - "3333:3333"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   db_data:
