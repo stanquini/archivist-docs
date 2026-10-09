@@ -19,7 +19,8 @@ Bun is the package manager (`bun.lock`); the runtime is Node 24 (see `apps/api/i
 bun install
 bun run start:dev          # Nest watch mode
 bun run build              # nest build -> dist/
-bun run lint               # oxlint --type-aware src/ test/
+bun run lint               # oxlint --type-aware, then eslint (src/ test/)
+bun run lint:fix
 bun run format             # prettier (single quotes, trailing commas)
 bun run test               # vitest, unit specs: **/*.spec.ts
 bun run test:e2e           # vitest, e2e specs: **/*.e2e-spec.ts (vitest.config.e2e.ts)
@@ -48,4 +49,4 @@ Docker (from repo root): `docker compose up` starts Postgres and the API with ho
 - `src/app.module.ts` creates `ObserveModule`/`ObserveInstrument` via `createObserveModule()` from `@nestjs/observe`; `main.ts` passes `ObserveInstrument` to `NestFactory.create`. `ConfigModule` is global.
 - **Required env vars**: `OBSERVE_APP_KEY` and `OBSERVE_APP_SECRET` are read with `getOrThrow`, so the app (and the e2e test, which boots the full `AppModule`) fails to start without them. See `.env.example`. `PORT` defaults to 3000 in code but 3333 in `.env`/Docker.
 - Vitest runs with `globals: true` (`describe`/`it`/`expect` without imports; `vitest/globals` is in tsconfig `types`).
-- Lint rules of note (`.oxlintrc.json`): `no-floating-promises` is an error; `no-explicit-any` is off.
+- Lint: oxlint (`.oxlintrc.json`) runs first, then ESLint (`eslint.config.mjs`, typescript-eslint `recommendedTypeChecked` + prettier). `eslint-plugin-oxlint` disables in ESLint any rule oxlint already covers, so add oxlint-supported rules to `.oxlintrc.json`. `no-floating-promises` is an error; `no-explicit-any` is off; `no-unsafe-*` are warnings.
